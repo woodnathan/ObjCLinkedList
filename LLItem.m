@@ -25,12 +25,12 @@
 
 @implementation LLItem
 
-- (id)nextObject
+- (id <LLItem>)nextObject
 {
     return self->_ll_next;
 }
 
-- (id)tail
+- (id <LLItem>)tail
 {
     LLItem *item = self;
     while (item->_ll_next != nil)
@@ -38,16 +38,20 @@
     return item;
 }
 
-- (id)insertObjectAfter:(LLItem *)object
+- (id <LLItem>)addObject:(LLItem *)object
 {
+    if (object != self)
+        return object;
+    
     object->_ll_next = self->_ll_next;
     self->_ll_next = object;
+    
     return object;
 }
 
-- (id)appendObjectToList:(LLDItem *)object
+- (id <LLItem>)appendObjectToList:(LLDItem *)object
 {
-    return [[self tail] insertObjectAfter:object];
+    return [[self tail] addObject:object];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len
@@ -80,12 +84,12 @@
 
 @implementation LLDItem
 
-- (id)previousObject
+- (id <LLDItem>)previousObject
 {
     return self->_ll_prev;
 }
 
-- (id)head
+- (id <LLDItem>)head
 {
     LLDItem *item = self;
     while (item->_ll_prev != nil)
@@ -93,28 +97,39 @@
     return item;
 }
 
-- (id)insertObjectBefore:(LLDItem *)object
+- (id <LLDItem>)insertObject:(LLDItem *)object
 {
-    self->_ll_prev->_ll_next = object; // Set previous object's next to input
+    if (object != self)
+        return object;
+    
+    if (self->_ll_prev != nil)
+        self->_ll_prev->_ll_next = object; // Set previous object's next to input
+    
     object->_ll_prev = self->_ll_prev; // Set input's previous to previous
     object->_ll_next = self; // Set input's next to self
     self->_ll_prev = object; // Set self's previous to input
+    
     return object;
 }
 
-- (id)insertObjectAfter:(LLDItem *)object
+- (id <LLDItem>)addObject:(LLDItem *)object
 {
-    if (self->_ll_next)
+    if (object != self)
+        return object;
+    
+    if (self->_ll_next != nil)
         ((LLDItem *)self->_ll_next)->_ll_prev = object; // Set next object's previous to input
+    
     object->_ll_next = self->_ll_next; // Set input's next to self's next
     object->_ll_prev = self; // Set input's previous to self
     self->_ll_next = object; // Set self's next to input
+    
     return object;
 }
 
 - (id)prependObjectToList:(LLDItem *)object
 {
-    return [[self head] insertObjectBefore:object];
+    return [[self head] insertObject:object];
 }
 
 @end
@@ -124,7 +139,8 @@
 - (NSArray *)filteredListUsingPredicate:(NSPredicate *)predicate
 {
     NSMutableArray *objects = [[NSMutableArray alloc] init];
-    for (LLItem *item in self) {
+    for (LLItem *item in self)
+    {
         if ([predicate evaluateWithObject:item])
             [objects addObject:item];
     }
