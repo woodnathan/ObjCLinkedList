@@ -40,18 +40,16 @@
 
 - (id <LLItem>)addObject:(LLItem *)object
 {
-    if (object != self)
-        return object;
-    
-    object->_ll_next = self->_ll_next;
+    if (object != nil)
+        object->_ll_next = self->_ll_next;
     self->_ll_next = object;
     
     return object;
 }
 
-- (id <LLItem>)appendObjectToList:(LLDItem *)object
+- (id <LLItem>)appendObjectToList:(LLItem *)object
 {
-    return [[self tail] addObject:object];
+    return [(id <LLItem>)[self tail] addObject:object];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len
@@ -99,14 +97,14 @@
 
 - (id <LLDItem>)insertObject:(LLDItem *)object
 {
-    if (object != self)
-        return object;
-    
     if (self->_ll_prev != nil)
         self->_ll_prev->_ll_next = object; // Set previous object's next to input
     
-    object->_ll_prev = self->_ll_prev; // Set input's previous to previous
-    object->_ll_next = self; // Set input's next to self
+    if (object != nil)
+    {
+        object->_ll_prev = self->_ll_prev; // Set input's previous to previous
+        object->_ll_next = self; // Set input's next to self
+    }
     self->_ll_prev = object; // Set self's previous to input
     
     return object;
@@ -114,14 +112,14 @@
 
 - (id <LLDItem>)addObject:(LLDItem *)object
 {
-    if (object != self)
-        return object;
-    
     if (self->_ll_next != nil)
         ((LLDItem *)self->_ll_next)->_ll_prev = object; // Set next object's previous to input
     
-    object->_ll_next = self->_ll_next; // Set input's next to self's next
-    object->_ll_prev = self; // Set input's previous to self
+    if (object != nil)
+    {
+        object->_ll_next = self->_ll_next; // Set input's next to self's next
+        object->_ll_prev = self; // Set input's previous to self
+    }
     self->_ll_next = object; // Set self's next to input
     
     return object;

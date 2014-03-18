@@ -92,7 +92,7 @@
  *
  *  @return The tail (last object) of the list
  */
-- (id <LLItem>)tail;
+- (id)tail;
 
 /**
  *  Inserts the specified object after the tail (last object) of the list
